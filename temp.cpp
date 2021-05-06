@@ -9,17 +9,11 @@ int main()
 	int N = 0 ;
 	cin >> N ;
 	int array[N] ;
-	int max = 0 ;
-	for(int i = 0 ;i < N ; i ++)
-	{
-		cin >> array[i] ;
-		if(max <= array[i])
-			max = array[i] ;
-	}
 
-	int count[max+1] ;
-	for(int i = 0 ; i < max+1 ; i ++)
-		count[i] = 0 ;
+	for(int i = 0 ;i < N ; i ++)
+		cin >> array[i] ;
+
+	int count[100001] = {0};
 	for(int i = 0 ; i < N ; i ++)
 		count[array[i]] ++ ;
 
