@@ -30,21 +30,53 @@ def target_time(input_str, mode): #return the target time and the place to look 
 	endminute = int(-1)
 	time_inter = 0
 	result = []
-	# if(mode and later.search(input_str)):
-	# 	target_obj = later.search(input_str)
-	# 	target_str = target_obj.group()
-	# 	time_str = "1970-01-01 00:00"
-	# 	if (target_str=='明天'):
-	# 		time_str = shift_time(1, 0, 0)
-	# 	elif (target_str=='後天'):
-	# 		time_str = shift_time(2, 0, 0)
-	# 	elif (target_str=='大後天'):
-	# 		time_str = shift_time(3, 0, 0)
-	# 	if(time.search(input_str)):
-	# 		ntarget_obj = time.search(input_str)
-	# 		ntarget_str = ntarget_obj.group()
-
-	# 	return [time_str, input_str[len(target_str):]]
+	if(later.search(input_str)):
+		target_obj = later.search(input_str)
+		target_str = target_obj.group()
+		time_str = "1970-01-01 00:00"
+		if (target_str=='明天'):
+			time_str = shift_time(1, 0, 0)
+		elif (target_str=='後天'):
+			time_str = shift_time(2, 0, 0)
+		elif (target_str=='大後天'):
+			time_str = shift_time(3, 0, 0)
+		input_str = input_str[target_obj.end():]
+		if(time.search(input_str)):
+			ntarget_obj = time.search(input_str)
+			ntarget_str = ntarget_obj.group()
+			minute = 0
+			if(ntarget_str.find('點')):
+				hour = numt._trans(ntarget_str[:ntarget_str.index('點')])
+				if('分' in ntarget_str):
+						minute = numt._trans(ntarget_str[ntarget_str.index('點')+1:ntarget_str.index('分')])
+			elif(ntarget_str.find('時')):
+				hour = numt._trans(ntarget_str[:ntarget_str.index('時')])
+				if('分' in ntarget_str):
+						minute = numt._trans(ntarget_str[ntarget_str.index('點')+1:ntarget_str.index('分')])
+			time_str = time_str[0:11]+("%02d:%02d" %(hour, minute))
+			result.append(time_str)
+			input_str = input_str[ntarget_obj.end():]
+		if(input_str[0]=='到' and time.search(input_str)):
+			if(time.search(input_str)):
+				ntarget_obj = time.search(input_str)
+				ntarget_str = ntarget_obj.group()
+				minute = 0
+				if(ntarget_str.find('點')):
+					hour = numt._trans(ntarget_str[:ntarget_str.index('點')])
+					if('分' in ntarget_str):
+						minute = numt._trans(ntarget_str[ntarget_str.index('點')+1:ntarget_str.index('分')])
+				elif(ntarget_str.find('時')):
+					hour = numt._trans(ntarget_str[:ntarget_str.index('時')])
+					if('分' in ntarget_str):
+							minute = numt._trans(ntarget_str[ntarget_str.index('點')+1:ntarget_str.index('分')])
+				time_str = time_str[0:11]+("%02d:%02d" %(hour, minute))
+				result.append(time_str)
+				input_str = input_str[ntarget_obj.end():]
+		else:
+			result.append(None)
+		result.append(input_str)
+		return result
+		############################################################################ABSOLUTE##############################################
 	if(date.search(input_str)):
 		target_obj = date.search(input_str)
 		month = numt._trans(input_str[target_obj.start():input_str.index('月')])
@@ -59,20 +91,27 @@ def target_time(input_str, mode): #return the target time and the place to look 
 		input_str = input_str[target_obj.end():]
 	if(time.search(input_str)):
 		target_obj = time.search(input_str)
-		if('點' in target_obj.group()):
+		if('點' in target_obj.group() and target_obj.group()[target_obj.group().index('點')].isnumeric() ):
 			hour = numt._trans(input_str[target_obj.start():input_str.index('點')])
 			input_str = input_str[input_str.index('點')+1:]
+			if('分' in input_str):
+				minute = numt._trans(input_str[:input_str.index('分')])
+				input_str = input_str[input_str.index('分')+1:]
+				# print(minute)
+			else:
+				minute = 0
 			# print(hour)
-		elif('時' in target_obj.group()):
+		elif('時' in target_obj.group() and target_obj.group()[target_obj.group().index('時')].isnumeric()):
 			hour = numt._trans(input_str[target_obj.start():input_str.index('時')])
 			input_str = input_str[input_str.index('時')+1:]
+			if('分' in input_str):
+				minute = numt._trans(input_str[:input_str.index('分')])
+				input_str = input_str[input_str.index('分')+1:]
+				# print(minute)
+			else:
+				minute = 0
 			# print(hour)
-		if('分' in input_str):
-			minute = numt._trans(input_str[:input_str.index('分')])
-			input_str = input_str[input_str.index('分')+1:]
-			# print(minute)
-		else:
-			minute = 0
+		
 	result.append(set_time([month, day, hour, minute]))
 	if(mode==0 and ('到' or ' 到')in input_str):
 		if(time.search(input_str)):
@@ -96,7 +135,9 @@ def target_time(input_str, mode): #return the target time and the place to look 
 			result.append(set_time([month, day, endhour, endminute]))
 		else:
 			time_inter = 0
-			# print('APPEND NONE')
 			result.append(None)
+	else:
+		time_inter = 0
+		result.append(None)
 	result.append(input_str.lstrip())
 	return result

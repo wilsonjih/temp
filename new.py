@@ -35,6 +35,7 @@ def text2func(input_str):
             if( keyword == keyword_str):
                 keyword_str = keyword
                 return [func_name, keyword]
+    return [func_name, 'None']
 
 
 def para_extract(input_str, func_key):
@@ -57,6 +58,7 @@ def para_extract(input_str, func_key):
             return ('FAILED', ('TARGET NOT FOUND'))
         if(target[0] in day_dict.keys()):
             para = time_extract.target_time(target[1:], 0)
+            print(para)
             return ('add_calender_week', (day_dict[target[0]], para[0], para[1], para[2]))
         else:
             return ('FAILED', ('DAY_NOT_DEFINED'))
@@ -75,12 +77,13 @@ def para_extract(input_str, func_key):
     elif( keyword == 'read_calender'):#=======================================READ_CALENDER
         para = time_extract.target_time(target, 0)
         return('read_calender', tuple([para[0][5:10]]))
-    elif( keyword == 'weather_forecast'):
-        target = input_str
+    elif( keyword == 'weather_forecast'):#====================================WEATHER_FORECAST
         para = time_extract.target_time(target, 1)
-        place = para[-1][0:-1*len(func_key[1])]
+        place = para[-1]
         if(len(place)==0):
             place = 'HERE'
+        elif(place[0] == '的'):
+            place = place[1:]
         return('weather_forecast', tuple([para[0],place] ))
     elif( keyword == 'open_bluetooth'):#======================================OPEN_BLUETOOTH============================
         return('open_bluetooth',())
@@ -105,22 +108,27 @@ def main(input_str):
     ret = para_extract(input_str, which)
     return ret
 
-print(main('打電話給新增行事曆'))
-# print(main('新增行事曆每週二十點都要到學校'))
+# print(main('新增行事曆十一月30號九點30分到十一點三十分要吃晚餐'))
 # print(' ')
-# print(main('新增行事曆每天十點十分到十一點都要去上課'))
+# print(main('新增行事曆十一月30號九點30分到八點三十分要吃晚餐'))
 # print(' ')
-# print(main('查詢行事曆十二月十八號'))
+# print(main('新增行事曆十一月30號九點要吃晚餐'))
 # print(' ')
-# print(main('天氣怎麼樣'))
+# print(main('新增行事曆每週二九點30分到十一點三十分要吃晚餐'))
 # print(' ')
-# print(main('台北天氣怎麼樣'))
+# print(main('新增行事曆每週二九點30分到八點三十分要吃晚餐'))
 # print(' ')
-# print(main('十一月二十八號天氣怎麼樣'))
+# print(main('新增行事曆每週二九點要吃晚餐'))
 # print(' ')
-# print(main('明天八點天氣怎麼樣'))
+# print(main('新增行事曆九點30分到十一點三十分要吃晚餐'))
 # print(' ')
-# print(main('十月十號八點台北天氣怎麼樣'))
+print(main('新增行事曆30分到點三十分要吃晚餐'))
+print(' ')
+# print(main('新增行事曆九點要吃晚餐'))
 # print(' ')
-# print(main('窩不知道'))
+# print(main('下一個行程'))
+# print(' ')
+# print(main('查看行事曆'))
+# print(' ')
+# print(main('查看行事曆十二月25號'))
 # print(' ')

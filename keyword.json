@@ -1,5 +1,5 @@
 {
-    "add_calender_week"    :{"keywords":["新增行事曆每週", "新增行事曆 每週"]},
+    "add_calender_week"    :{"keywords":["新增行事曆每週", "新增行事曆 每週", "新增行事曆每周", "新增行事曆 每周"]},
     "add_calender_day"     :{"keywords":["新增行事曆每天", "新增行事曆 每天"]},
     "add_calender"         :{"keywords":["新增行事曆"]},
     "read_calender"        :{"keywords":["查看行事曆", "查詢行事曆"]},
