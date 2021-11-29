@@ -82,6 +82,7 @@ def calender(input_str, index):
 def ask(input_str):
 	print('C')
 
+#last index function
 def dontknow(input_str, index):
 	mixer.init()
 	mixer.music.load('noCommand.mp3')
