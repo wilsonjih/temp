@@ -16,12 +16,14 @@ def shift_time(day, hour, minute):
 	return (datetime.datetime.now()+datetime.timedelta(days=day, hours=hour, minutes=minute)).strftime("%Y-%m-%d %H:%M")
 
 def target_time(input_str, mode): #return the target time and the place to look later
-	date = re.compile(r'((\d*)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)月((\d*)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)(日|號)')
-	time = re.compile(r'((\d*)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)(點|時)(((\d*)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)分)?')
-	later = re.compile(r'((明|後|大後)天)|(((\d*)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)(週|天|個?小時|分鐘)後)|下週(一|二|三|四|五|六|日|天)?')
+	date = re.compile(r'((\d+)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)月((\d+)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)(日|號)')
+	time = re.compile(r'((\d+)|(二|三|四|五|六|七|八|九)?十?(一|二|兩|三|四|五|六|七|八|九)?)(\.|點|時)(((\d+)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?))?')
+	later = re.compile(r'((明|後|大後)天)|(((\d+)|(二|三|四|五|六|七|八|九)?十?(一|二|三|四|五|六|七|八|九)?)(週|天|個?小時|分鐘)後)|下週(一|二|三|四|五|六|日|天)?')
+	one_99 = re.compile(r'(\d+)|((二|三|四|五|六|七|八|九)?十?(一|二|兩|三|四|五|六|七|八|九)?)')
 	target_obj = -1
 	# target_str = ''
 	time_inter = 0
+	time_str = 'NOW'
 	month = int(-1)
 	day = int(-1)
 	hour = int(-1)
@@ -56,7 +58,12 @@ def target_time(input_str, mode): #return the target time and the place to look 
 			time_str = time_str[0:11]+("%02d:%02d" %(hour, minute))
 			result.append(time_str)
 			input_str = input_str[ntarget_obj.end():]
-		if(input_str[0]=='到' and time.search(input_str)):
+		else:
+			if(mode == 0):
+				result.append(time_str[0:11]+'00:00')
+			else:
+				result.append(time_str[0:11]+'06:00')
+		if(input_str[0]=='到' and time.search(input_str) and mode == 0):
 			if(time.search(input_str)):
 				ntarget_obj = time.search(input_str)
 				ntarget_str = ntarget_obj.group()
@@ -69,10 +76,10 @@ def target_time(input_str, mode): #return the target time and the place to look 
 					hour = numt._trans(ntarget_str[:ntarget_str.index('時')])
 					if('分' in ntarget_str):
 							minute = numt._trans(ntarget_str[ntarget_str.index('點')+1:ntarget_str.index('分')])
-				time_str = time_str[0:11]+("%02d:%02d" %(hour, minute))
 				result.append(time_str)
+				time_str = time_str[0:11]+("%02d:%02d" %(hour, minute))
 				input_str = input_str[ntarget_obj.end():]
-		else:
+		elif(mode == 0):
 			result.append(None)
 		result.append(input_str)
 		return result
@@ -91,28 +98,35 @@ def target_time(input_str, mode): #return the target time and the place to look 
 		input_str = input_str[target_obj.end():]
 	if(time.search(input_str)):
 		target_obj = time.search(input_str)
-		if('點' in target_obj.group() and target_obj.group()[target_obj.group().index('點')].isnumeric() ):
+		target_str = target_obj.group()
+		print(target_str)
+		if('點' in target_obj.group() and target_obj.group()[:target_obj.group().index('點')].isnumeric() ):
 			hour = numt._trans(input_str[target_obj.start():input_str.index('點')])
 			input_str = input_str[input_str.index('點')+1:]
-			if('分' in input_str):
-				minute = numt._trans(input_str[:input_str.index('分')])
-				input_str = input_str[input_str.index('分')+1:]
-				# print(minute)
+			if( one_99.search(input_str)):
+				# print(one_99.search(input_str).group())
+				minute = numt._trans(one_99.search(input_str).group())
+				input_str = input_str[one_99.search(input_str).end():]
+			# if('分' in target_str):
+			# 	minute = numt._trans(input_str[:input_str.index('分')])
+			# input_str = input_str[input_str.index('分')+1:]
+			# print(minute)
 			else:
 				minute = 0
 			# print(hour)
-		elif('時' in target_obj.group() and target_obj.group()[target_obj.group().index('時')].isnumeric()):
+		elif('時' in target_obj.group() and target_obj.group()[:target_obj.group().index('時')].isnumeric()):
 			hour = numt._trans(input_str[target_obj.start():input_str.index('時')])
 			input_str = input_str[input_str.index('時')+1:]
-			if('分' in input_str):
+			if('分' in target_str):
 				minute = numt._trans(input_str[:input_str.index('分')])
 				input_str = input_str[input_str.index('分')+1:]
 				# print(minute)
 			else:
 				minute = 0
 			# print(hour)
-		
-	result.append(set_time([month, day, hour, minute]))
+		result.append(set_time([month, day, hour, minute]))
+	else:
+		result.append(shift_time(0, 0, 0))
 	if(mode==0 and ('到' or ' 到')in input_str):
 		if(time.search(input_str)):
 			time_inter = 1
@@ -126,10 +140,10 @@ def target_time(input_str, mode): #return the target time and the place to look 
 				endhour = numt._trans(input_str[target_obj.start():input_str.index('時')])
 				input_str = input_str[input_str.index('時')+1:]
 				# print(endhour)
-			if('分' in input_str):
-				endminute = numt._trans(input_str[:input_str.index('分')])
-				input_str = input_str[input_str.index('分')+1:]
-				# print(endminute)
+			if( one_99.search(input_str)):
+				# print(one_99.search(input_str).group())
+				endminute = numt._trans(one_99.search(input_str).group())
+				input_str = input_str[one_99.search(input_str).end():]
 			else:
 				endminute = 0
 			result.append(set_time([month, day, endhour, endminute]))
